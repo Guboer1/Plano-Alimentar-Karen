@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Rotina Diária - Karen</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sage: #5C6B5E; --sage-dark: #3A4A3C; --sage-deep: #1A2A1C;
+    --mint: #A8C5A0; --mint-light: #D4E8D0; --mint-pale: #EDF5EB;
+    --cream: #FFF8F0; --warm: #E8DDD3;
+    --peach: #E8A87C; --rose: #D4726A;
+    --text: #2C3E2E; --text-light: #6B7F6D;
+    --white: #FFFFFF; --w80: rgba(255,255,255,0.85); --w50: rgba(255,255,255,0.5);
+    --card-bg: rgba(255,248,240,0.06); --card-border: rgba(168,197,160,0.2);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: linear-gradient(180deg, #1A2A1C 0%, #0F1F11 100%);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--white);
+    min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .hero {
+    background: linear-gradient(160deg, #1A2A1C 0%, #2A3F2C 40%, #3A4A3C 100%);
+    padding: 44px 20px 28px; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .hero::after { content:''; position:absolute; bottom:0; left:0; right:0; height:40px; background:linear-gradient(transparent, #0F1F11); }
+  .hero h1 {
+    font-family:'Playfair Display'; font-size:2.4rem; font-weight:700;
+    color: var(--mint-light); line-height:1.1;
+  }
+  .hero .sub {
+    font-size:0.8rem; font-weight:500; color:var(--mint);
+    letter-spacing:1.5px; text-transform:uppercase; margin-top:4px;
+  }
+
+  /* Jejum Timer */
+  .jejum-wrap {
+    margin:16px 20px 0; padding:14px 16px; border-radius:14px;
+    background:rgba(168,197,160,0.08); border:1px solid rgba(168,197,160,0.15);
+    text-align:center; position:relative; z-index:1;
+  }
+  .jejum-wrap h4 {
+    font-family:'Playfair Display'; font-size:1rem; color:var(--mint-light);
+    margin-bottom:6px;
+  }
+  .jejum-timer { font-size:2rem; font-weight:700; color:var(--peach); font-variant-numeric:tabular-nums; }
+  .jejum-sub { font-size:0.7rem; color:var(--w50); margin-top:4px; }
+  .jejum-btn {
+    margin-top:8px; padding:6px 20px; border-radius:16px; border:1px solid var(--mint);
+    background:transparent; color:var(--mint); font-size:0.75rem; font-weight:600;
+    cursor:pointer; letter-spacing:0.5px;
+  }
+  .jejum-btn:active { background:var(--sage); }
+
+  /* Water tracker */
+  .water-wrap {
+    margin:12px 20px 0; padding:12px 16px; border-radius:14px;
+    background:rgba(168,197,160,0.06); border:1px solid rgba(168,197,160,0.12);
+    position:relative; z-index:1;
+  }
+  .water-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .water-header span { font-size:0.8rem; color:var(--mint); font-weight:600; }
+  .water-bar { height:8px; border-radius:8px; background:rgba(255,255,255,0.06); overflow:hidden; }
+  .water-fill { height:100%; border-radius:8px; background:linear-gradient(90deg, #5BA3D9, #7BC8F6); transition:width 0.4s; }
+  .water-btns { display:flex; gap:8px; margin-top:8px; }
+  .water-btn {
+    flex:1; padding:6px; border-radius:10px; border:1px solid rgba(91,163,217,0.3);
+    background:rgba(91,163,217,0.08); color:#7BC8F6; font-size:0.72rem;
+    font-weight:600; cursor:pointer; text-align:center;
+  }
+  .water-btn:active { background:rgba(91,163,217,0.2); }
+
+  /* Progress */
+  .progress-wrap { padding:12px 20px 0; position:relative; z-index:1; }
+  .progress-bar { background:rgba(255,255,255,0.06); border-radius:20px; height:7px; overflow:hidden; margin-top:4px; }
+  .progress-fill { height:100%; background:linear-gradient(90deg, var(--mint), var(--mint-light)); border-radius:20px; transition:width 0.5s; width:0%; }
+  .progress-label { font-size:0.68rem; color:var(--w50); text-align:center; margin-top:3px; }
+
+  .container { max-width:600px; margin:0 auto; padding:0 16px 30px; }
+
+  .sec-title {
+    font-family:'Playfair Display'; font-size:1.3rem; color:var(--mint-light);
+    text-align:center; margin:22px 0 10px;
+  }
+  .sec-title::after { content:''; display:block; width:30px; height:2px; margin:4px auto 0; background:var(--mint); border-radius:1px; }
+
+  /* Timeline */
+  .timeline { position:relative; padding:10px 0 0 30px; }
+  .timeline::before {
+    content:''; position:absolute; left:9px; top:0; bottom:0;
+    width:2px; background:linear-gradient(to bottom, var(--mint), var(--sage), var(--sage-dark));
+  }
+
+  .card {
+    position:relative; margin-bottom:10px;
+    background:rgba(168,197,160,0.04); border:1px solid rgba(168,197,160,0.1);
+    border-radius:12px; padding:12px 13px 10px; transition:all 0.3s;
+  }
+  .card.done { opacity:0.4; }
+  .card::before {
+    content:''; position:absolute; left:-26px; top:14px;
+    width:9px; height:9px; border-radius:50%;
+    background:var(--mint); box-shadow:0 0 6px rgba(168,197,160,0.3);
+  }
+  .card::after {
+    content:''; position:absolute; left:0; top:5px; bottom:5px;
+    width:3px; background:var(--mint); border-radius:2px;
+  }
+  .card.wo { background:rgba(232,168,124,0.05); border-color:rgba(232,168,124,0.15); }
+  .card.wo::before { background:var(--peach); box-shadow:0 0 6px rgba(232,168,124,0.3); }
+  .card.wo::after { background:var(--peach); }
+
+  .card-head { display:flex; align-items:center; gap:7px; margin-bottom:5px; }
+  .card-head .emoji { font-size:1rem; }
+  .card-head .title { font-weight:700; font-size:0.85rem; color:var(--mint-light); flex:1; }
+  .card-head .time-badge {
+    font-size:0.65rem; font-weight:600; color:var(--peach);
+    background:rgba(232,168,124,0.1); border:1px solid rgba(232,168,124,0.2);
+    border-radius:10px; padding:2px 8px;
+  }
+  .card.wo .card-head .title { color:var(--peach); }
+
+  .check-btn {
+    width:24px; height:24px; border-radius:50%; border:2px solid var(--sage);
+    background:transparent; cursor:pointer; display:flex; align-items:center;
+    justify-content:center; transition:all 0.2s; flex-shrink:0;
+  }
+  .check-btn.checked { background:var(--mint); border-color:var(--mint); }
+  .check-btn.checked::after { content:'✓'; color:var(--sage-deep); font-size:13px; font-weight:700; }
+  .card.wo .check-btn.checked { background:var(--peach); border-color:var(--peach); }
+
+  .card ul { list-style:none; padding:0; }
+  .card ul li {
+    padding:2px 0; font-size:0.78rem; color:var(--w80); padding-left:13px;
+    position:relative; line-height:1.4;
+  }
+  .card ul li::before { content:'›'; position:absolute; left:0; color:var(--mint); font-weight:700; font-size:1rem; line-height:1.2; }
+  .card.wo ul li::before { color:var(--peach); }
+
+  .tag {
+    display:inline-block; margin-top:5px; padding:2px 9px;
+    border-radius:10px; font-size:0.68rem; font-weight:600;
+  }
+  .tag.green { background:rgba(168,197,160,0.12); border:1px solid rgba(168,197,160,0.2); color:var(--mint); }
+  .tag.orange { background:rgba(232,168,124,0.1); border:1px solid rgba(232,168,124,0.2); color:var(--peach); }
+
+  .alert-box {
+    margin-top:5px; padding:4px 9px; border-radius:6px;
+    background:rgba(212,114,106,0.08); border:1px solid rgba(212,114,106,0.18);
+    font-size:0.68rem; color:var(--rose); line-height:1.35;
+  }
+
+  /* Subs toggle */
+  .subs-toggle {
+    font-size:0.68rem; color:var(--w50); cursor:pointer; margin-top:4px;
+    display:inline-block; text-decoration:underline;
+  }
+  .subs-content { display:none; font-size:0.68rem; color:var(--w50); margin-top:3px; line-height:1.4; }
+  .subs-content.show { display:block; }
+
+  /* Premissas */
+  .prem-list { display:flex; flex-direction:column; gap:8px; }
+  .prem-item {
+    display:flex; gap:10px; align-items:flex-start;
+    background:rgba(168,197,160,0.06); border:1px solid rgba(168,197,160,0.1);
+    border-radius:10px; padding:10px 12px;
+  }
+  .prem-item .pi { font-size:1.1rem; flex-shrink:0; }
+  .prem-item .pt { font-size:0.75rem; color:var(--w80); line-height:1.4; }
+  .prem-item .pt strong { color:var(--mint-light); }
+
+  .meta-banner {
+    background:rgba(168,197,160,0.08); border:1.5px solid var(--sage);
+    border-radius:14px; padding:16px; text-align:center; margin:20px 0;
+  }
+  .meta-banner h3 { font-family:'Playfair Display'; font-size:1.3rem; color:var(--mint-light); }
+  .meta-banner p { font-size:0.75rem; color:var(--w50); margin-top:4px; }
+
+  .reset-btn {
+    display:block; margin:10px auto 20px; padding:7px 22px; border-radius:18px;
+    background:transparent; border:1px solid var(--sage); color:var(--mint);
+    font-size:0.75rem; font-weight:600; cursor:pointer; letter-spacing:0.5px;
+  }
+  .reset-btn:active { background:var(--sage); }
+
+  .footer { text-align:center; padding:8px 0 30px; font-size:0.62rem; color:rgba(255,255,255,0.2); }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Rotina Diária</h1>
+  <div class="sub">Karen Dos Santos De Boer · Nutri: Sabrina Nin</div>
+</div>
+
+<!-- Jejum Timer -->
+<div class="jejum-wrap">
+  <h4>⏱ Jejum Intermitente 16h</h4>
+  <div class="jejum-timer" id="jejumTimer">00:00:00</div>
+  <div class="jejum-sub">Última refeição → 16h de jejum · Pode: água, chá, café (sem adoçar)</div>
+  <button class="jejum-btn" id="jejumBtn" onclick="toggleJejum()">Iniciar Jejum</button>
+</div>
+
+<!-- Water Tracker -->
+<div class="water-wrap">
+  <div class="water-header">
+    <span>💧 Água: <span id="waterCount">0</span> / 3L</span>
+    <span style="font-size:0.68rem;color:var(--w50);" id="waterMl">0ml</span>
+  </div>
+  <div class="water-bar"><div class="water-fill" id="waterFill" style="width:0%"></div></div>
+  <div class="water-btns">
+    <button class="water-btn" onclick="addWater(250)">+250ml</button>
+    <button class="water-btn" onclick="addWater(500)">+500ml</button>
+    <button class="water-btn" onclick="addWater(-250)">-250ml</button>
+  </div>
+</div>
+
+<!-- Progress -->
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel">0/5 concluído</div>
+</div>
+
+<div class="container">
+
+  <div class="sec-title">Orientações</div>
+  <div class="prem-list">
+    <div class="prem-item"><span class="pi">🥗</span><div class="pt"><strong>Jejum 16h:</strong> Manter até o almoço. Contar a partir da última refeição. Pode: água, chá, café (sem adoçar).</div></div>
+    <div class="prem-item"><span class="pi">💧</span><div class="pt"><strong>Água:</strong> Mín. 3L/dia (50ml × peso). Sem líquido durante refeições — 30 min depois.</div></div>
+    <div class="prem-item"><span class="pi">🥩</span><div class="pt"><strong>Carne vermelha:</strong> Máx 2x/semana. Priorizar peixes brancos e frango.</div></div>
+    <div class="prem-item"><span class="pi">🚫</span><div class="pt"><strong>Evitar:</strong> Processados, açúcar, refri, temperos prontos, gordura de carnes/pele de frango, bebidas alcoólicas, adoçantes.</div></div>
+    <div class="prem-item"><span class="pi">✅</span><div class="pt"><strong>Preferir:</strong> Orgânicos, integrais, temperos naturais (salsa, alecrim, cúrcuma, gengibre).</div></div>
+  </div>
+
+  <div class="sec-title">Passo a Passo do Dia</div>
+  <p style="text-align:center;font-size:0.68rem;color:var(--w50);margin-bottom:8px;">Toque no ✓ para marcar</p>
+
+  <div class="timeline">
+
+    <!-- Shot Matinal -->
+    <div class="card" data-id="0">
+      <div class="card-head">
+        <span class="emoji">🌅</span>
+        <span class="title">Shot Matinal (em jejum)</span>
+        <span class="time-badge">manhã</span>
+        <button class="check-btn" onclick="toggle(this)"></button>
+      </div>
+      <ul>
+        <li>¼ col. chá gengibre em pó</li>
+        <li>Suco de meio limão</li>
+        <li>¼ col. chá cúrcuma em pó (ou fresca ralada)</li>
+        <li>Pitada de pimenta preta</li>
+        <li>Água morna (opcional)</li>
+      </ul>
+      <span class="tag green">Anti-inflamatório · Antioxidante · Digestivo</span>
+    </div>
+
+    <!-- 14h Quebra -->
+    <div class="card" data-id="1">
+      <div class="card-head">
+        <span class="emoji">🥤</span>
+        <span class="title">Quebra do Jejum</span>
+        <span class="time-badge">14h</span>
+        <button class="check-btn" onclick="toggle(this)"></button>
+      </div>
+      <ul>
+        <li><strong>Proteína vegetal Dobro</strong> — 2 scoops (30g)</li>
+      </ul>
+      <span class="tag orange">30-60 min antes do almoço</span>
+    </div>
+
+    <!-- 15h Almoço -->
+    <div class="card" data-id="2">
+      <div class="card-head">
+        <span class="emoji">🍽️</span>
+        <span class="title">Almoço</span>
+        <span class="time-badge">15h</span>
+        <button class="check-btn" onclick="toggle(this)"></button>
+      </div>
+      <ul>
+        <li><strong>Salada de folhas</strong> + vegetais crus — 1 prato sobremesa (100g)</li>
+        <li><strong>Mix de sementes</strong> — 1 col. sopa cheia (20g)</li>
+        <li><strong>Azeite extravirgem</strong> — 1 col. sobremesa (5ml)</li>
+        <li><strong>Vegetais cozidos/grelhados</strong> — 4 col. arroz cheias (160g)</li>
+        <li><strong>Abóbora cabotian</strong> — 3 col. sopa cheias (108g)</li>
+        <li><strong>Arroz integral</strong> — 2 col. servir cheias (110g)</li>
+        <li><strong>Filé de frango grelhado</strong> — 2 bifes médios (150g)</li>
+        <li><strong>Kiwi</strong> — 2 unidades médias (152g)</li>
+      </ul>
+      <span class="subs-toggle" onclick="toggleSubs('subs-almoco')">▸ Ver substituições</span>
+      <div class="subs-content" id="subs-almoco">
+        <strong>Abóbora →</strong> Arroz branco 50g · Batata inglesa 60g · Batata-doce 30g · Mandioca 20g · Mandioquinha 70g · Quinoa 40g<br>
+        <strong>Arroz integral →</strong> Arroz branco 90g · Batata inglesa 120g · Batata-doce 84g · Mandioca 60g · Macarrão integral s/glúten 75g · Quinoa 100g<br>
+        <strong>Frango →</strong> Sobrecoxa 100g · Frango desfiado 140g · Peixe branco 155g · Salmão 120g · Atum 120g · Filé mignon 110g · Patinho 110g<br>
+        <strong>Kiwi →</strong> Abacaxi 150g · Mamão formosa 170g · Laranja 180g · Tangerina 135g
+      </div>
+      <div class="alert-box">Carne vermelha máx 2x/sem · Frutas com enzimas digestivas · Sem líquido durante</div>
+    </div>
+
+    <!-- 17h Lanche -->
+    <div class="card" data-id="3">
+      <div class="card-head">
+        <span class="emoji">🫐</span>
+        <span class="title">Lanche da Tarde</span>
+        <span class="time-badge">17h</span>
+        <button class="check-btn" onclick="toggle(this)"></button>
+      </div>
+      <ul>
+        <li><strong>Frutas vermelhas</strong> — 1 xícara (115g)</li>
+        <li><strong>Banana prata</strong> — 1 grande (80g)</li>
+        <li><strong>Body Protein Equaliv</strong> — 1 dosador (20g)</li>
+        <li><strong>Semente de chia</strong> — 1 col. sopa cheia (15g)</li>
+        <li><strong>Farelo de aveia</strong> — 2 col. sopa (20g)</li>
+      </ul>
+      <span class="tag green">Cupons: Equaliv SABRINANIN · Vitafor SN70399VITAFOR</span>
+    </div>
+
+    <!-- 19h Pré-treino -->
+    <div class="card wo" data-id="4">
+      <div class="card-head">
+        <span class="emoji">🏋️‍♀️</span>
+        <span class="title">Pré-Treino</span>
+        <span class="time-badge">19h</span>
+        <button class="check-btn" onclick="toggle(this)"></button>
+      </div>
+      <ul>
+        <li><strong>Ovo</strong> — 1 inteiro (50g) + 1 clara (34g)</li>
+        <li><strong>Banana prata</strong> — 1,5 grande (120g)</li>
+        <li><strong>Azeite extravirgem</strong> — 1 col. sobremesa (5ml)</li>
+      </ul>
+      <span class="subs-toggle" onclick="toggleSubs('subs-pre')">▸ Ver substituições</span>
+      <div class="subs-content" id="subs-pre">
+        <strong>Banana →</strong> Pão de Mandioquinha Funcional (Padoca do Bem) 2 fatias (80g)
+      </div>
+    </div>
+
+    <!-- Jantar Opção 1 -->
+    <div class="card" data-id="5a" style="display:none;">
+      <div class="card-head">
+        <span class="emoji">🥣</span>
+        <span class="title">Jantar/Pós-Treino — Opção 1</span>
+        <button class="check-btn" onclick="toggle(this)"></button>
+      </div>
+      <ul>
+        <li><strong>Frutas vermelhas</strong> — 1 xícara picado (144g)</li>
+        <li><strong>Banana prata</strong> — 1 grande (80g)</li>
+        <li><strong>Isofort Plant (Vitafor)</strong> — 1,5 col. medida (45g)</li>
+        <li><strong>Aveia em flocos</strong> — 2 col. sopa cheias (30g)</li>
+        <li><strong>Creatina (Equaliv)</strong> — 2 scoops (6g)</li>
+      </ul>
+    </div>
+
+    <!-- Jantar Opção 2 -->
+    <div class="card" data-id="5b" style="display:none;">
+      <div class="card-head">
+        <span class="emoji">🥗</span>
+        <span class="title">Jantar/Pós-Treino — Opção 2</span>
+        <button class="check-btn" onclick="toggle(this)"></button>
+      </div>
+      <ul>
+        <li><strong>Salada de folhas</strong> — à vontade</li>
+        <li><strong>Azeite</strong> — 1 col. sopa (8ml)</li>
+        <li><strong>Vegetais cozidos</strong> — 3 col. arroz cheias (120g)</li>
+        <li><strong>Arroz integral</strong> — 3 col. sopa cheias (60g)</li>
+        <li><strong>Batata-doce</strong> — 2 col. sopa cheias (84g)</li>
+        <li><strong>Peixe branco</strong> — 1 filé grande (155g)</li>
+        <li><strong>Creatina (Equaliv)</strong> — 2 scoops (6g)</li>
+      </ul>
+      <span class="subs-toggle" onclick="toggleSubs('subs-jant2')">▸ Ver substituições</span>
+      <div class="subs-content" id="subs-jant2">
+        <strong>Arroz integral →</strong> Arroz branco 62.5g · Batata inglesa 75g · Batata-doce 42g · Mandioca 35g · Quinoa 60g · Abóbora 126g<br>
+        <strong>Peixe →</strong> Sobrecoxa 100g · Frango desfiado 140g · Frango grelhado 150g · Salmão 120g · Atum 120g
+      </div>
+    </div>
+
+    <!-- Jantar selector -->
+    <div class="card" data-id="5">
+      <div class="card-head">
+        <span class="emoji">🌙</span>
+        <span class="title">Jantar / Pós-Treino</span>
+        <button class="check-btn" onclick="toggle(this)"></button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button onclick="showJantar(1)" style="flex:1;padding:8px;border-radius:10px;border:1px solid rgba(168,197,160,0.2);background:rgba(168,197,160,0.08);color:var(--mint);font-size:0.75rem;font-weight:600;cursor:pointer;">
+          🥣 Opção 1<br><span style="font-size:0.65rem;color:var(--w50);">Smoothie proteico</span>
+        </button>
+        <button onclick="showJantar(2)" style="flex:1;padding:8px;border-radius:10px;border:1px solid rgba(168,197,160,0.2);background:rgba(168,197,160,0.08);color:var(--mint);font-size:0.75rem;font-weight:600;cursor:pointer;">
+          🥗 Opção 2<br><span style="font-size:0.65rem;color:var(--w50);">Prato completo</span>
+        </button>
+      </div>
+      <div class="alert-box" style="margin-top:6px;">Creatina: Equaliv, Puravida, Essential, Nutrify, Vitafor, Dux</div>
+    </div>
+
+  </div>
+
+  <!-- Mix de Sementes -->
+  <div class="sec-title">Mix de Sementes</div>
+  <div class="prem-item" style="flex-direction:column;">
+    <div class="pt">
+      2 col. sopa semente de girassol · 2 col. sopa semente de abóbora · 1 col. sopa gergelim · 1 col. sopa chia · 1 col. sopa linhaça<br>
+      <strong>Misture tudo num potinho de vidro. Polvilhe 1 col. sopa na salada.</strong>
+    </div>
+  </div>
+
+  <div class="meta-banner">
+    <h3>🎯 Jejum 16h + 3L água + Treino</h3>
+    <p>Nutri: Sabrina Nin · CRN-3 70399 · @sabrinanin.nutri</p>
+  </div>
+
+  <button class="reset-btn" onclick="resetAll()">↻ Resetar dia</button>
+  <div class="footer">Sabrina Nin · Nutricionista Funcional · CRN-3 70399</div>
+</div>
+
+<script>
+const TOTAL = 6;
+const getToday = () => new Date().toISOString().slice(0,10);
+
+function getState() {
+  try {
+    const r = localStorage.getItem('karen_rotina');
+    if(!r) return {date:getToday(),checks:{},water:0,jejumStart:null};
+    const s = JSON.parse(r);
+    if(s.date!==getToday()) return {date:getToday(),checks:{},water:0,jejumStart:s.jejumStart};
+    return s;
+  } catch { return {date:getToday(),checks:{},water:0,jejumStart:null}; }
+}
+function saveState(s) { try{localStorage.setItem('karen_rotina',JSON.stringify(s))}catch{} }
+
+function updateProgress() {
+  const s = getState();
+  const done = Object.values(s.checks).filter(Boolean).length;
+  const pct = Math.round((done/TOTAL)*100);
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('progressLabel').textContent = done+'/'+TOTAL+' concluído';
+  document.querySelectorAll('.card[data-id]').forEach(c => {
+    const id = c.dataset.id;
+    const btn = c.querySelector('.check-btn');
+    if(btn) {
+      if(s.checks[id]) { btn.classList.add('checked'); c.classList.add('done'); }
+      else { btn.classList.remove('checked'); c.classList.remove('done'); }
+    }
+  });
+  // Water
+  document.getElementById('waterCount').textContent = (s.water/1000).toFixed(1)+'L';
+  document.getElementById('waterMl').textContent = s.water+'ml';
+  document.getElementById('waterFill').style.width = Math.min(100, (s.water/3000)*100)+'%';
+}
+
+function toggle(btn) {
+  const c = btn.closest('.card'); const id = c.dataset.id;
+  const s = getState(); s.checks[id] = !s.checks[id]; saveState(s); updateProgress();
+}
+
+function addWater(ml) {
+  const s = getState(); s.water = Math.max(0, s.water + ml); saveState(s); updateProgress();
+}
+
+function resetAll() {
+  saveState({date:getToday(),checks:{},water:0,jejumStart:null});
+  updateProgress(); updateJejumUI();
+}
+
+function toggleSubs(id) {
+  document.getElementById(id).classList.toggle('show');
+}
+
+function showJantar(opt) {
+  document.querySelector('[data-id="5a"]').style.display = opt===1?'block':'none';
+  document.querySelector('[data-id="5b"]').style.display = opt===2?'block':'none';
+}
+
+// Jejum timer
+function toggleJejum() {
+  const s = getState();
+  if(s.jejumStart) { s.jejumStart = null; }
+  else { s.jejumStart = Date.now(); }
+  saveState(s); updateJejumUI();
+}
+
+function updateJejumUI() {
+  const s = getState();
+  const btn = document.getElementById('jejumBtn');
+  if(s.jejumStart) {
+    btn.textContent = '⏹ Parar Jejum';
+    updateJejumTimer();
+  } else {
+    btn.textContent = '▶ Iniciar Jejum';
+    document.getElementById('jejumTimer').textContent = '00:00:00';
+  }
+}
+
+function updateJejumTimer() {
+  const s = getState();
+  if(!s.jejumStart) return;
+  const diff = Date.now() - s.jejumStart;
+  const h = Math.floor(diff/3600000);
+  const m = Math.floor((diff%3600000)/60000);
+  const sec = Math.floor((diff%60000)/1000);
+  const el = document.getElementById('jejumTimer');
+  el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  el.style.color = h >= 16 ? '#A8C5A0' : '#E8A87C';
+  requestAnimationFrame(() => setTimeout(updateJejumTimer, 1000));
+}
+
+updateProgress();
+updateJejumUI();
+</script>
+</body>
+</html>
